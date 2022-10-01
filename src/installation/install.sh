@@ -8,7 +8,7 @@
 # those commands execute parts of the process explained above (and reports its success/failure)
 echo "Starting to execute..."
 
-if ./installation/startVMs.sh ; then
+if ./installation/launchVMs.sh ; then
     echo "Success: Started all VMs."
 else
     echo "Error: Failed to start the VMs."
