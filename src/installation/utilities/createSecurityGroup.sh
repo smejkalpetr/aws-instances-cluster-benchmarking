@@ -2,7 +2,6 @@
 
 # This script screate a security gruoup with suitable rules in order to be able to do the assigment instructions
 
-echo "###>>>>---------------<<<<###"
 echo "Creating new Security Group..."
 
 read -p "Enter your VPC ID (you can find it on the AWS Dashboard): " vpcID
