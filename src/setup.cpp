@@ -9,8 +9,15 @@
 #include <sstream>
 #include <array>
 
+/*  This program is a simple controller to maintain other bash scripts. It's just a wrapper to properly see
+ *  what the user is doing and for easier management of stored properties.
+ *  The program allows the user to create a new key pair, create a new security group, launch VMs and
+ *  connect them in a target group (cluster).
+ */
+
 // Source of the next struct & class: https://github.com/RaymiiOrg/cpp-command-output,
-// author allows free usage and modification)
+// author allows free usage and modification) 
+// Was needed so that both exit code and return data can be used at once
 struct CommandResult {
     std::string output;
     int exitstatus;
@@ -72,6 +79,7 @@ void printMenu() {
     std::cout << "###>>>-------------------------<<<###" << std::endl;
 }
 
+// Creates a new Key Pair by using other bash scripts
 void createKeyPair() {
     std::cout << "Creating a new Key Pair..." << std::endl;
 
@@ -86,6 +94,7 @@ void createKeyPair() {
     std::cout << Command::exec(oss.str().c_str()) << std::endl;
 }
 
+// Util func to parse just GroupId from the reponse
 std::string parseSecurityGroupId(std::string inp) {
     std::string token = inp.substr(inp.find("GroupId"));
     std::string quote = token.substr(11);
@@ -94,6 +103,7 @@ std::string parseSecurityGroupId(std::string inp) {
     return parsed;
 }
 
+// Creates a new SG by using bash scripts
 void createSecurityGroup() {
     std::cout << "Creating a new Security Group (and will apply its rules)..." << std::endl;
 
@@ -119,6 +129,8 @@ void createSecurityGroup() {
     std::cout << oss2.str() << std::endl;
 }
 
+// Allows user to decide which kind of VMs they wanna launch and
+// their count and then launches the machines
 void launchVirtualMachine() {
     int instOpt = 0;
     int instNo = 0;
@@ -157,10 +169,12 @@ void launchVirtualMachine() {
     std::cout << Command::exec(oss.str().c_str()) << std::endl;
 }
 
+// Joins given VMs in a Target Group (Cluster)
 void createClusters() {
 
 }
 
+// Automated setup where the result are two clusters
 void setup() {
 
 }
@@ -200,5 +214,3 @@ int main(int argc, char ** argv) {
 
     return 0;
 }
-
-
