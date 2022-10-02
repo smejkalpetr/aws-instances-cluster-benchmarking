@@ -1,13 +1,14 @@
 # asks user for their IP address and exports it to the environment
 
+# #::: setup.sh :::#
+# This script sets the environment to build VMs and clusters on.
+
 read -p "Enter your IP address (check at https://checkip.amazonaws.com/): " myIp
 export myIp
 
-export awsAmi="ami-0149b2da6ceec4bb0"
+. ./utilities/createKeyPair.sh
 
-echo ""
+. ./utilities/createSecurityGroup.sh
 
-./createKeyPair.sh && ./createSecurityGroup.sh
-
-echo ""
 echo "Setup finished."
+echo ""
