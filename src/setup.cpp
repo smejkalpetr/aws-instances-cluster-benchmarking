@@ -79,7 +79,7 @@ void createKeyPair() {
     std::cin >> keyPairName;
 
     std::ostringstream oss;
-    oss << "./installation/utilities/createKeyPair.sh" << " " << keyPairName;
+    oss << "./installation/createKeyPair.sh" << " " << keyPairName;
 
     std::cout << "Executing script: " << oss.str() << std::endl;
 
@@ -110,7 +110,7 @@ void createSecurityGroup() {
     getline(std::cin >> std::ws, securityGroupDesc);
 
     std::ostringstream oss;
-    oss << "./installation/utilities/createSecurityGroup.sh" << " " << vpcId << " " << securityGroupName << " " << '"' << securityGroupDesc << '"' << " " << myIp;
+    oss << "./installation/createSecurityGroup.sh" << " " << vpcId << " " << securityGroupName << " " << '"' << securityGroupDesc << '"' << " " << myIp;
 
     std::ostringstream oss2;
     std::cout << "Executing script: " << oss.str() << std::endl;
@@ -144,7 +144,7 @@ void launchVirtualMachine() {
      std::cout << "Enter number of instance that you want to create (max 5): " << std::endl;
      std::cin >> instNo;
 
-     if(instNo > 5) { 
+     if(instNo > 5 || instNo < 0) { 
         std::cout << "Invalid number of instances!" << std::endl;
         return;
     }
