@@ -8,6 +8,7 @@
 #include <ostream>
 #include <sstream>
 #include <array>
+#include <vector>
 
 /*  This program is a simple controller to maintain other bash scripts. It's just a wrapper to properly see
  *  what the user is doing and for easier management of stored properties.
@@ -68,6 +69,7 @@ std::string securityGroupDesc = "";
 std::string vpcId = "";
 std::string myIp = "";
 std::string awsAmi = "ami-0149b2da6ceec4bb0";
+std::vector <std::string> virtualMachineIds; 
 
 void printMenu() {
     std::cout << " M E N U : " << std::endl;
@@ -169,8 +171,30 @@ void launchVirtualMachines() {
     std::cout << Command::exec(oss.str().c_str()) << std::endl;
 }
 
-void createVirtualMachines() {
+std::string parseVirtualMachineId(std::string inp) {
+    std::string token = inp.substr(inp.find("VpcId"));
+    std::string quote = token.substr(9);
+    std::string parsed = quote.substr(0, quote.find("\""));
+    std::cout << "(" << parsed << ")" << std::endl;
+    return parsed;
+}
 
+void createOneVirtualMachine(std::string type) {
+    std::ostringstream oss, oss2;
+    oss << "./src/installation/launchVMs.sh" << " " << awsAmi << " " << keyPairName << " " << securityGroupId << " " << 1 << " " << type;
+    
+    oss2 << Command::exec(oss.str().c_str()) << std::endl;
+
+    std::string result = parseVirtualMachineId(oss2.str());
+    virtualMachineIds.push_back(result);
+}
+
+// Creates all required VMs
+void createVirtualMachines() {
+    for (size_t i = 0; i < 1; i++){
+        createOneVirtualMachine("t2.large");
+    }
+    
 }
 
 // Joins given VMs in a Target Group (Cluster)
