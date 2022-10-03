@@ -71,11 +71,11 @@ std::string awsAmi = "ami-0149b2da6ceec4bb0";
 
 void printMenu() {
     std::cout << " M E N U : " << std::endl;
-    std::cout << "[S] AUTO SETUP" << std::endl;
-    std::cout << "[K] CREATE NEW KEY PAIR" << std::endl;
-    std::cout << "[G] CREATE NEW SECURITY GROUP" << std::endl;
-    std::cout << "[V] CREATE CREATE NEW VIRTUAL MACHINE" << std::endl;
-    std::cout << "[X] EXIT" << std::endl;
+    std::cout << "[s] AUTO SETUP" << std::endl;
+    std::cout << "[k] CREATE NEW KEY PAIR" << std::endl;
+    std::cout << "[g] CREATE NEW SECURITY GROUP" << std::endl;
+    std::cout << "[v] CREATE CREATE NEW VIRTUAL MACHINE" << std::endl;
+    std::cout << "[x] EXIT" << std::endl;
     std::cout << "###>>>-------------------------<<<###" << std::endl;
 }
 
@@ -87,7 +87,7 @@ void createKeyPair() {
     std::cin >> keyPairName;
 
     std::ostringstream oss;
-    oss << "./installation/createKeyPair.sh" << " " << keyPairName;
+    oss << "./src/installation/createKeyPair.sh" << " " << keyPairName;
 
     std::cout << "Executing script: " << oss.str() << std::endl;
 
@@ -120,7 +120,7 @@ void createSecurityGroup() {
     getline(std::cin >> std::ws, securityGroupDesc);
 
     std::ostringstream oss;
-    oss << "./installation/createSecurityGroup.sh" << " " << vpcId << " " << securityGroupName << " " << '"' << securityGroupDesc << '"' << " " << myIp;
+    oss << "./src/installation/createSecurityGroup.sh" << " " << vpcId << " " << securityGroupName << " " << '"' << securityGroupDesc << '"' << " " << myIp;
 
     std::ostringstream oss2;
     std::cout << "Executing script: " << oss.str() << std::endl;
@@ -131,7 +131,7 @@ void createSecurityGroup() {
 
 // Allows user to decide which kind of VMs they wanna launch and
 // their count and then launches the machines
-void launchVirtualMachine() {
+void launchVirtualMachines() {
     int instOpt = 0;
     int instNo = 0;
     std::string instType = "";
@@ -162,11 +162,15 @@ void launchVirtualMachine() {
     }
 
     std::ostringstream oss;
-    oss << "./installation/launchVMs.sh" << " " << awsAmi << " " << keyPairName << " " << securityGroupId << " " << instNo << " " << instType;
+    oss << "./src/installation/launchVMs.sh" << " " << awsAmi << " " << keyPairName << " " << securityGroupId << " " << instNo << " " << instType;
 
     std::cout << "Executing script: " << oss.str() << std::endl;
 
     std::cout << Command::exec(oss.str().c_str()) << std::endl;
+}
+
+void createVirtualMachines() {
+
 }
 
 // Joins given VMs in a Target Group (Cluster)
@@ -176,7 +180,10 @@ void createClusters() {
 
 // Automated setup where the result are two clusters
 void setup() {
-
+    createKeyPair();
+    createSecurityGroup();
+    createVirtualMachines();
+    createClusters();
 }
 
 int main(int argc, char ** argv) {
@@ -200,7 +207,7 @@ int main(int argc, char ** argv) {
             createSecurityGroup();
             break;
         case 'v':
-            launchVirtualMachine();
+            launchVirtualMachines();
             break;
         case 'x':
             isRunning = false;
