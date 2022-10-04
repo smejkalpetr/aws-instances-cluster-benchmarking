@@ -5,7 +5,7 @@
 
 # install python
 apt-get update
-apt-install python3.8
+apt-install python3
 #install venv module
 apt-install python3-venv
 #create folder and open it
@@ -15,7 +15,6 @@ cd flask_application
 python3 -m venv venv
 source venv/bin/activate
 #install flask
-pip install Flask
-#deactivate (REMOVE THIS LATER)
-deactivate
-
+y | pip install Flask
+#the python file should be inserted in this folder, not sure how to do this
+FLASK_APP=VMinstance.py flask run -p 80
