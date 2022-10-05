@@ -26,13 +26,13 @@ def create_ec2_instance(instance_type):
     print("create_ec2_instance hello")
 
 
-def start_ec2_instance(instance_id):
+def start_ec2_instance(instance_ids):
     print("start_ec2_instance hello")
 
 
-def stop_ec2_instance(instance_id):
+def stop_ec2_instances(instance_ids):
     print("stop_ec2_instance hello")
 
 
-def terminate_ec2_instance(instance_id):
+def terminate_ec2_instances(instance_ids):
     print("terminate_ec2_instance hello")
