@@ -1,24 +1,22 @@
-CXX = g++
-CXXFLAGS = -Wall -pedantic
-CPPFLAGS = -std=c++17
+VENV = ./venv/
+KEYS = ./keys/
 
-BIN = ./bin/
-SRC = ./src/
+all: mkdir install run
 
-all: compile run
-
-compile: mkdir setup
-
-setup:
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(SRC)setup.cpp -o $(BIN)setup.bin
-
-mkdir:
-	mkdir -p $(BIN)
+install:
+	virtualenv venv && \
+	source venv/bin/activate && \
+	pip3 install -r requirements.txt;
 
 run:
-	chmod +x $(BIN)setup.bin
-	$(BIN)setup.bin
+	python3 ./pyt/main.py
+
+mkdir: 
+	mkdir -p $(KEYS)
+
+stop:
+	deactivate
 
 clean:
-	rm -rf $(BIN)
+	rm -rf $(VENV)
 	
