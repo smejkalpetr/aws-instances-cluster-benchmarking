@@ -1,33 +1,96 @@
-def create_key_pair():
-    print("create_key_pair hello")
+import boto3
 
 
-def change_key_pair_path(path):
-    print("change_key_pair_path hello")
+def create_key_pair(name="log8145-key-pair"):
+    client = boto3.client('ec2')
+
+    try:
+        response = client.create_key_pair(KeyName=name)
+
+        pem_file = open(f"./keys/{name}.pem", "w")
+        n = pem_file.write(response['KeyMaterial'])
+        pem_file.close()
+
+        print("The new private key has been saved to ./keys directory.")
+        return f"./keys/{name}.pem"
+    except Exception as e:
+        print(e)
 
 
-def remove_key_pair_path():
-    print("remove_key_pair_path hello")
+def create_security_group(
+        vpc_id,
+        name="log8145-security-group",
+        description="SG for VMs used in LOG8145"
+):
+    client = boto3.client('ec2')
+
+    try:
+        response = client.create_security_group(GroupName=name,
+                                                Description=description,
+                                                VpcId=vpc_id)
+        security_group_id = response['GroupId']
+        print('Security Group Created %s in vpc %s.' % (security_group_id, vpc_id))
+
+        data = client.authorize_security_group_ingress(
+            GroupId=security_group_id,
+            IpPermissions=[
+                {'IpProtocol': 'tcp',
+                 'FromPort': 80,
+                 'ToPort': 80,
+                 'IpRanges': [{'CidrIp': '0.0.0.0/0'}]},
+                {'IpProtocol': 'tcp',
+                 'FromPort': 22,
+                 'ToPort': 22,
+                 'IpRanges': [{'CidrIp': '0.0.0.0/0'}]}
+            ])
+        print('Ingress Successfully Set %s' % data)
+        return security_group_id
+    except Exception as e:
+        print(e)
 
 
-def create_security_group():
-    print("create_security_group hello")
+def describe_security_group_id_by_name(name):
+    client = boto3.client('ec2')
+
+    try:
+        response = client.describe_security_groups(GroupNames=[name])
+        return response['SecurityGroups'][0]['GroupId']
+    except Exception as e:
+        print(e)
+
+def describe_security_group_by_id(sg_id):
+    client = boto3.client('ec2')
+
+    try:
+        response = client.describe_security_groups(GroupIds=[sg_id])
+        return response
+    except Exception as e:
+        print(e)
 
 
-def change_security_group_name(name):
-    print("change_security_group hello")
+def create_ec2_instances(security_group_id,
+                         instance_type="t2.micro",
+                         count=1,
+                         ami="ami-0149b2da6ceec4bb0"
+    ):
+    client = boto3.client('ec2')
 
-
-def change_security_group_id(id):
-    print("change_security_group_id hello")
-
-
-def create_ec2_instance(instance_type):
-    print("create_ec2_instance hello")
-
-
-def start_ec2_instance(instance_ids):
-    print("start_ec2_instance hello")
+    try:
+        response = client.run_instances(
+            ImageId=ami,
+            InstanceType=instance_type,
+            MaxCount=count,
+            MinCount=count,
+            Monitoring={
+                'Enabled': True
+            },
+            SecurityGroupIds=[
+                security_group_id,
+            ]
+        )
+        return response['Instances']
+    except Exception as e:
+        print(e)
 
 
 def stop_ec2_instances(instance_ids):
