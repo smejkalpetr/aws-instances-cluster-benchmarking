@@ -69,7 +69,8 @@ std::string securityGroupDesc = "";
 std::string vpcId = "";
 std::string myIp = "";
 std::string awsAmi = "ami-0149b2da6ceec4bb0";
-std::vector <std::string> virtualMachineIds; 
+std::vector <std::string> virtualMachineM4Ids; 
+std::vector <std::string> virtualMachineT2Ids; 
 
 void printMenu() {
     std::cout << " M E N U : " << std::endl;
@@ -175,11 +176,11 @@ std::string parseVirtualMachineId(std::string inp) {
     std::string token = inp.substr(inp.find("VpcId"));
     std::string quote = token.substr(9);
     std::string parsed = quote.substr(0, quote.find("\""));
-    std::cout << "(" << parsed << ")" << std::endl;
+    std::cout << "Virtual machine (" << parsed << ") created." << std::endl;
     return parsed;
 }
 
-void createOneVirtualMachine(std::string type) {
+void createOneVirtualMachine(std::string type, std::vector <std::string> virtualMachineIds) {
     std::ostringstream oss, oss2;
     oss << "./src/installation/launchVMs.sh" << " " << awsAmi << " " << keyPairName << " " << securityGroupId << " " << 1 << " " << type;
     
@@ -191,23 +192,34 @@ void createOneVirtualMachine(std::string type) {
 
 // Creates all required VMs
 void createVirtualMachines() {
-    for (size_t i = 0; i < 1; i++){
-        createOneVirtualMachine("t2.large");
+    for (size_t i = 0; i < 1; i++) {
+        createOneVirtualMachine("t2.large", virtualMachineT2Ids);
+    }
+
+    for (size_t i = 0; i < 0; i++) {
+        createOneVirtualMachine("m4.large", virtualMachineM4Ids);
     }
     
 }
 
 // Joins given VMs in a Target Group (Cluster)
 void createClusters() {
+    std::ostringstream oss;
+    oss << "./src/installation/createClusters.sh";
 
+    std::cout << "Executing script: " << oss.str() << std::endl;
+
+    std::cout << Command::exec(oss.str().c_str()) << std::endl;
 }
 
 // Automated setup where the result are two clusters
 void setup() {
-    createKeyPair();
-    createSecurityGroup();
-    createVirtualMachines();
+    //createKeyPair();
+    //createSecurityGroup();
+    //createVirtualMachines();
     createClusters();
+    virtualMachineM4Ids.clear();
+    virtualMachineT2Ids.clear();
 }
 
 int main(int argc, char ** argv) {
