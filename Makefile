@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 VENV = ./venv/
 KEYS = ./keys/
 
