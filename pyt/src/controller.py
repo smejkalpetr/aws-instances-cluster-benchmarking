@@ -49,9 +49,10 @@ class Controller:
         print("  [h] LAUNCH A NEW VM INSTANCE")
         print("  [i] STOP A VM INSTANCE")
         print("  [j] TERMINATE A VM INSTANCE")
+        print("  [k] START A VM INSTANCE")
         print("<<------------------------>>")
 
-        print("  [k] LIST MENU")
+        print("  [l] LIST MENU")
         print("  [x] QUIT")
         print("")
 
@@ -145,8 +146,42 @@ class Controller:
 
         print(f"VM with the following ID has been created: {response_vm[0]['InstanceId']}")
 
-    def start_all_vms(self):
-        print("start all vms")
+    def start_one_vm(self):
+        instance_id = input("Insert the instance ID: ").split()
+
+        if len(instance_id) > 0:
+            instance_id = instance_id[0]
+        else:
+            print("Wrong input!")
+            return
+
+        response = self.utilities.start_ec2_instances([instance_id])
+        print(response)
+
+    def stop_one_vm(self):
+        instance_id = input("Insert the instance ID: ").split()
+
+        if len(instance_id) > 0:
+            instance_id = instance_id[0]
+        else:
+            print("Wrong input!")
+            return
+
+        response = self.utilities.stop_ec2_instances([instance_id])
+        print(response)
+
+    def terminate_one_vm(self):
+        instance_id = input("Insert the instance ID: ").split()
+
+        if len(instance_id) > 0:
+            instance_id = instance_id[0]
+        else:
+            print("Wrong input!")
+            return
+
+        response = self.utilities.terminate_ec2_instances([instance_id])
+        print(response)
+    
 
     def auto_setup(self):
        print("autosetup")
@@ -182,10 +217,12 @@ class Controller:
             elif cmd_input == 'h':
                 self.launch_one_vm()
             elif cmd_input == 'i':
-                print("stop vm")
+                self.stop_one_vm()
             elif cmd_input == 'j':
-                print("terminate vm")
+                self.terminate_one_vm()
             elif cmd_input == 'k':
+                self.start_one_vm()
+            elif cmd_input == 'l':
                 self.printMenu()
             elif cmd_input == 'x':
                 print("Goodbye! :)")

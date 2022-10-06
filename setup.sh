@@ -16,7 +16,6 @@ else
         virtualenv venv && \
     	source venv/bin/activate && \
     	pip install -r requirements.txt;
-    f
     elif [  "$1" == "run" ];
     then
         echo "Running..."
@@ -24,6 +23,7 @@ else
     elif [  "$1" == "clean" ];
     then
         echo "Cleaning..."
+        deactivate
         rm -rf ./venv
     elif [  "$1" == "deactivate" ];
     then

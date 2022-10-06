@@ -106,14 +106,32 @@ def create_ec2_instances(security_group_id,
 
 
 def stop_ec2_instances(instance_ids, silent=False) -> dict:
-    response = client.stop_instances(InstanceIds=instance_ids)
+    client = boto3.client('ec2')
 
-    if not silent:
+    try:
+        response = client.stop_instances(InstanceIds=instance_ids)
         return response
+    except Exception as e:
+        if not silent:
+            print(e)
+
+def start_ec2_instances(instance_ids, silent=False) -> dict:
+    client = boto3.client('ec2')
+
+    try:
+        response = client.start_instances(InstanceIds=instance_ids)
+        return response
+    except Exception as e:
+        if not silent:
+            print(e)
 
 
 def terminate_ec2_instances(instance_ids, silent=False) -> dict:
-    response = client.terminate_instances(InstanceIds=instance_ids)
+    client = boto3.client('ec2')
 
-    if not silent:
+    try:
+        response = client.terminate_instances(InstanceIds=instance_ids)
         return response
+    except Exception as e:
+        if not silent:
+            print(e)
