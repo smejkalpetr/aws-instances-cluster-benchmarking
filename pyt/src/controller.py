@@ -14,17 +14,20 @@ class Controller:
     utilities = src.utilities
 
     def initialize_env(self):
+        print("Initializing...")
         if not exists(self.constants.KEY_PAIR_PATH):
-            self.utilities.create_key_pair()
-            print("this")
+            self.utilities.create_key_pair(silent=True)
 
         if self.constants.SECURITY_GROUP_NAME is not None:
-            response_sg_id = self.utilities.describe_security_group_id_by_name(self.constants.SECURITY_GROUP_NAME)
+            response_sg_id = self.utilities.describe_security_group_id_by_name(self.constants.SECURITY_GROUP_NAME, silent=True)
             if response_sg_id is not None:
                 self.constants.SECURITY_GROUP_ID = response_sg_id
+        
+        print("Initialization done.")
 
 
     def printMenu(self):
+        print("")
         print(" M E N U: ")
 
         print("")
@@ -53,6 +56,7 @@ class Controller:
         print("")
 
     def create_kp(self):
+        print("Creating a new Key Pair...")
         self.constants.KEY_PAIR_PATH = self.utilities.create_key_pair()
 
     def change_kp_path(self):
@@ -125,20 +129,21 @@ class Controller:
             return
 
         if self.constants.SECURITY_GROUP_NAME is None:
-            self.constants.SECURITY_GROUP_ID = self.utilities.create_security_group(self.constants.VPC_ID)
+            self.constants.SECURITY_GROUP_ID = self.utilities.create_security_group(self.constants.VPC_ID, silent=True)
 
         if self.constants.SECURITY_GROUP_ID is None:
-            response_sg_id = self.utilities.describe_security_group_id_by_name(self.constants.SECURITY_GROUP_NAME)
+            response_sg_id = self.utilities.describe_security_group_id_by_name(self.constants.SECURITY_GROUP_NAME, silent=True)
             if response_sg_id is None:
                 print("Creating new Security Group...")
-                self.constants.SECURITY_GROUP_ID = self.utilities.create_security_group(self.constants.VPC_ID)
+                self.constants.SECURITY_GROUP_ID = self.utilities.create_security_group(self.constants.VPC_ID, silent=True)
             else:
                 self.constants.SECURITY_GROUP_ID = response_sg_id
 
+        print("Creating a new VM instance...")
         response_vm = self.utilities.create_ec2_instances(self.constants.SECURITY_GROUP_ID)
         self.vm_instances.append(response_vm[0]['InstanceId'])
 
-        print(f"VM with following ID has been created: {response_vm[0]['InstanceId']}")
+        print(f"VM with the following ID has been created: {response_vm[0]['InstanceId']}")
 
     def start_all_vms(self):
         print("start all vms")

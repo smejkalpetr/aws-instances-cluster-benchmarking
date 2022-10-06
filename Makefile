@@ -6,9 +6,7 @@ KEYS = ./keys/
 all: mkdir install run
 
 install:
-	virtualenv venv && \
-	source venv/bin/activate && \
-	pip3 install -r requirements.txt;
+		. ./setup.sh
 
 run:
 	python3 ./pyt/main.py

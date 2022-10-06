@@ -23,7 +23,7 @@ def create_key_pair(name="log8145-key-pair", silent=False):
 def create_security_group(
         vpc_id,
         name="log8145-security-group",
-        description="SG for VMs used in LOG8145"
+        description="SG for VMs used in LOG8145",
         silent=False
 ):
     client = boto3.client('ec2')
@@ -57,7 +57,7 @@ def create_security_group(
             print(e)
 
 
-def describe_security_group_id_by_name(name):
+def describe_security_group_id_by_name(name, silent=False):
     client = boto3.client('ec2')
 
     try:
@@ -105,9 +105,15 @@ def create_ec2_instances(security_group_id,
             print(e)
 
 
-def stop_ec2_instances(instance_ids):
-    print("stop_ec2_instance hello")
+def stop_ec2_instances(instance_ids, silent=False) -> dict:
+    response = client.stop_instances(InstanceIds=instance_ids)
+
+    if not silent:
+        return response
 
 
-def terminate_ec2_instances(instance_ids):
-    print("terminate_ec2_instance hello")
+def terminate_ec2_instances(instance_ids, silent=False) -> dict:
+    response = client.terminate_instances(InstanceIds=instance_ids)
+
+    if not silent:
+        return response
