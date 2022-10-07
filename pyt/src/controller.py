@@ -193,7 +193,7 @@ class Controller:
         self.elastic_load_balancer = src.elastic_load_balancer.ElasticLoadBalancer()
         
         self.elastic_load_balancer.create_elb()
-        self.elastic_load_balancer.create_clusters(self.constants.VPC_ID)
+        self.elastic_load_balancer.create_clusters()
 
     def run(self):
         self.initialize_env()

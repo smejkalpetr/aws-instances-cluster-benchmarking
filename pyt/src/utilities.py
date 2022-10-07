@@ -135,3 +135,60 @@ def terminate_ec2_instances(instance_ids, silent=False) -> dict:
     except Exception as e:
         if not silent:
             print(e)
+
+def create_target_group(name, vpc_id, silent=False) -> dict:
+    client = boto3.client('elbv2')
+
+    try:
+        response = client.create_target_group(
+            Name=name,
+            Protocol='HTTP',
+            Port=80,
+            VpcId=vpc_id,
+            HealthCheckProtocol='HTTP',
+            HealthCheckPort='80',
+            HealthCheckEnabled=True,
+            HealthCheckIntervalSeconds=10,
+            HealthCheckTimeoutSeconds=9,
+            HealthyThresholdCount=10,
+            UnhealthyThresholdCount=10,
+            TargetType='instance',
+            Tags=[
+                {
+                    'Key': 'Name',
+                    'Value': name
+                },
+            ],
+            IpAddressType='ipv4'
+        )
+        return response
+    except Exception as e:
+        if not silent:
+            print(e)
+
+def create_elastic_load_balancer(name, security_group_id, silent=False) -> dict:
+    client_ec2 = boto3.client('ec2')
+    try:
+        client = boto3.client('elbv2')
+        client_ec2 = boto3.client('ec2')
+
+        response = client.create_load_balancer(
+        Name=name,
+        Subnets = [s['SubnetId'] for s in client_ec2.describe_subnets()['Subnets']],
+        SecurityGroups=[
+            security_group_id
+        ],
+        Scheme='internet-facing',
+        Tags=[
+            {
+                'Key': 'string',
+                'Value': 'string'
+            },
+        ],
+        Type='application',
+        IpAddressType='ipv4'
+        )
+        return response
+    except Exception as e:
+        if not silent:
+            print(e)
