@@ -3,6 +3,7 @@ from dataclasses import asdict
 import boto3
 import src.constants
 import src.utilities
+import src.elastic_load_balancer
 from os.path import exists
 
 
@@ -12,6 +13,7 @@ class Controller:
     client = boto3.client('ec2')
     constants = src.constants.Constants
     utilities = src.utilities
+    elastic_load_balancer = None
 
     def initialize_env(self):
         print("Initializing...")
@@ -124,7 +126,7 @@ class Controller:
         self.constants.SECURITY_GROUP_ID = None
         print("Security Group name and ID have been reset.")
 
-    def launch_one_vm(self):
+    def check_sg_and_kp(self):
         if self.constants.KEY_PAIR_PATH is None:
             print("Error: There is no Key Pair path specified. Specify one and then try again.")
             return
@@ -139,6 +141,9 @@ class Controller:
                 self.constants.SECURITY_GROUP_ID = self.utilities.create_security_group(self.constants.VPC_ID, silent=True)
             else:
                 self.constants.SECURITY_GROUP_ID = response_sg_id
+
+    def launch_one_vm(self):
+        self.check_sg_and_kp()
 
         print("Creating a new VM instance...")
         response_vm = self.utilities.create_ec2_instances(self.constants.SECURITY_GROUP_ID)
@@ -184,7 +189,11 @@ class Controller:
     
 
     def auto_setup(self):
-       print("autosetup")
+        self.check_sg_and_kp()
+        self.elastic_load_balancer = src.elastic_load_balancer.ElasticLoadBalancer()
+        
+        self.elastic_load_balancer.create_elb()
+        self.elastic_load_balancer.create_clusters(self.constants.VPC_ID)
 
     def run(self):
         self.initialize_env()
