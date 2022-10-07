@@ -205,3 +205,15 @@ def register_targets(target_group_arn, targets, silent=False) ->dict:
     except Exception as e:
         if not silent:
             print(e)
+
+def wait_for_instances(ids):
+    client = boto3.client('ec2')
+
+    waiter = client.get_waiter('instance_running')
+    waiter.wait(
+        InstanceIds=ids,
+        WaiterConfig={
+            'Delay': 10,
+            'MaxAttempts': 30
+        }
+    )

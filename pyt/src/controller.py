@@ -18,7 +18,7 @@ class Controller:
     def initialize_env(self):
         print("Initializing...")
         if not exists(self.constants.KEY_PAIR_PATH):
-            self.utilities.create_key_pair(silent=True)
+            self.utilities.create_key_pair()
 
         if self.constants.SECURITY_GROUP_NAME is not None:
             response_sg_id = self.utilities.describe_security_group_id_by_name(self.constants.SECURITY_GROUP_NAME, silent=True)
