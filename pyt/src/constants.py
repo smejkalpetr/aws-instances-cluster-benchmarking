@@ -15,7 +15,7 @@ class Constants:
 
     # You need to change VPC_ID to your own before using the program
     # You can find it on the EC2 Dashboard
-    VPC_ID = "vpc-02772b45b225e1508"
+    VPC_ID = "vpc-0afbee2a2cf707f72"
 
     SUBNET1_ID = None
     SUBNET2_ID = None

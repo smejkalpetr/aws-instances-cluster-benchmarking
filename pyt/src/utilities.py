@@ -1,5 +1,7 @@
 import boto3
 
+def print_info(message):
+    print(f'[INFO] {message}')
 
 def create_key_pair(name="log8145-key-pair", silent=False):
     client = boto3.client('ec2')
@@ -12,7 +14,7 @@ def create_key_pair(name="log8145-key-pair", silent=False):
         pem_file.close()
 
         if not silent:
-            print("The new private key has been saved to ./keys directory.")
+            print_info("The new private key has been saved to ./keys directory.")
 
         return f"./keys/{name}.pem"
     except Exception as e:
@@ -34,7 +36,7 @@ def create_security_group(
                                                 VpcId=vpc_id)
         security_group_id = response['GroupId']
         if not silent:
-            print('Security Group Created %s in vpc %s.' % (security_group_id, vpc_id))
+            print_info('Security Group Created %s in vpc %s.' % (security_group_id, vpc_id))
 
         data = client.authorize_security_group_ingress(
             GroupId=security_group_id,
@@ -49,7 +51,7 @@ def create_security_group(
                  'IpRanges': [{'CidrIp': '0.0.0.0/0'}]}
             ])
         if not silent:
-            print('Ingress Successfully Set %s' % data)
+            print_info('Ingress Successfully Set %s' % data)
 
         return security_group_id
     except Exception as e:
@@ -76,7 +78,6 @@ def describe_security_group_by_id(sg_id, silent=False):
     except Exception as e:
         if not silent:
             print(e)
-
 
 def create_ec2_instances(security_group_id,
                          key_name,
@@ -106,7 +107,6 @@ def create_ec2_instances(security_group_id,
         if not silent:
             print(e)
 
-
 def stop_ec2_instances(instance_ids, silent=False) -> dict:
     client = boto3.client('ec2')
 
@@ -126,7 +126,6 @@ def start_ec2_instances(instance_ids, silent=False) -> dict:
     except Exception as e:
         if not silent:
             print(e)
-
 
 def terminate_ec2_instances(instance_ids, silent=False) -> dict:
     client = boto3.client('ec2')
@@ -208,11 +207,11 @@ def register_targets(target_group_arn, targets, silent=False) -> dict:
         if not silent:
             print(e)
 
-def wait_for_instances(ids, silent=False):
+def wait_for_instances(ids, state, silent=False):
     client = boto3.client('ec2')
 
     try:
-        waiter = client.get_waiter('instance_running')
+        waiter = client.get_waiter(state)
         waiter.wait(
             InstanceIds=ids,
             WaiterConfig={
@@ -272,3 +271,64 @@ def create_rule(listener_arn, target_group_name, target_group_arn, rule_count, s
     except Exception as e:
         if not silent:
             print(e)
+
+def delete_rule(rule_arn, silent=False):
+    client = boto3.client('elbv2')
+
+    try:
+        response = client.delete_rule(RuleArn=rule_arn)
+
+    except Exception as e:
+        if not silent:
+            print(e)
+
+def delete_listener(listener_arn, silent=False):
+    client = boto3.client('elbv2')
+
+    try: 
+        response = client.delete_listener(ListenerArn=listener_arn)
+
+    except Exception as e:
+        if not silent:
+            print(e)
+
+def delete_load_balancer(load_balancer_arn, silent=False):
+    client = boto3.client('elbv2')
+
+    try: 
+        response = client.delete_load_balancer(LoadBalancerArn=load_balancer_arn)
+
+    except Exception as e:
+        if not silent:
+            print(e)
+
+def delete_target_group(target_group_arn, silent=False):
+    client = boto3.client('elbv2')
+
+    try: 
+        response = client.delete_target_group(TargetGroupArn=target_group_arn)
+
+    except Exception as e:
+        if not silent:
+            print(e)
+
+def delete_security_group(group_id, silent=False):
+    client = boto3.client('ec2')
+
+    try: 
+        response = client.delete_security_group(GroupId=group_id)
+
+    except Exception as e:
+        if not silent:
+            print(e)
+
+def delete_key_pair(key_pair_name, silent=False):
+    client = boto3.client('ec2')
+
+    try: 
+        response = client.delete_key_pair(KeyName=key_pair_name)
+
+    except Exception as e:
+        if not silent:
+            print(e)
+
