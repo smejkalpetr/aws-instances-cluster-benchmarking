@@ -85,7 +85,6 @@ def create_ec2_instances(security_group_id,
                          silent=False
     ):
     client = boto3.client('ec2')
-
     try:
         response = client.run_instances(
             ImageId=ami,
@@ -100,6 +99,7 @@ def create_ec2_instances(security_group_id,
             ]
         )
         return response['Instances']
+
     except Exception as e:
         if not silent:
             print(e)
@@ -143,6 +143,7 @@ def create_target_group(name, vpc_id, silent=False) -> dict:
         response = client.create_target_group(
             Name=name,
             Protocol='HTTP',
+            ProtocolVersion='HTTP1',
             Port=80,
             VpcId=vpc_id,
             HealthCheckProtocol='HTTP',
@@ -167,11 +168,10 @@ def create_target_group(name, vpc_id, silent=False) -> dict:
             print(e)
 
 def create_elastic_load_balancer(name, security_group_id, silent=False) -> dict:
+    client = boto3.client('elbv2')
     client_ec2 = boto3.client('ec2')
-    try:
-        client = boto3.client('elbv2')
-        client_ec2 = boto3.client('ec2')
 
+    try:
         response = client.create_load_balancer(
         Name=name,
         Subnets = [s['SubnetId'] for s in client_ec2.describe_subnets()['Subnets']],
@@ -187,6 +187,19 @@ def create_elastic_load_balancer(name, security_group_id, silent=False) -> dict:
         ],
         Type='application',
         IpAddressType='ipv4'
+        )
+        return response
+    except Exception as e:
+        if not silent:
+            print(e)
+
+def register_targets(target_group_arn, targets, silent=False) ->dict:
+    client = boto3.client('elbv2')
+
+    try:
+        response = client.register_targets(
+            TargetGroupArn=target_group_arn,
+            Targets=targets
         )
         return response
     except Exception as e:

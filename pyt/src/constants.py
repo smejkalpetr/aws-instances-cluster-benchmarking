@@ -8,6 +8,10 @@ class Constants:
     ELASTIC_LOAD_BALANCER_NAME = "log8145-elastic-load-balancer"
     TARGET_GROUP_1_NAME = "cluster1"
     TARGET_GROUP_2_NAME = "cluster2"
+    T2_LARGE = "t2.micro"
+    M4_LARGE = "t2.micro"
+    NUMBER_OF_T2_LARGE_INSTANCES = 1
+    NUMBER_OF_M4_LARGE_INSTANCES = 1
 
     # You need to change VPC_ID to your own before using the program
     # You can find it on the EC2 Dashboard

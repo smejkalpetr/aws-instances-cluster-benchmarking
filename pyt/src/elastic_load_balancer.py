@@ -10,12 +10,33 @@ class ElasticLoadBalancer:
         print("Elastic balancer created...")
 
     def create_clusters(self):
-        response1 = self.utilities.create_target_group(self.constants.TARGET_GROUP_1_NAME, self.constants.VPC_ID)
-        response2 = self.utilities.create_target_group(self.constants.TARGET_GROUP_2_NAME, self.constants.VPC_ID)
-        print("Target groups created...")
+        self.create_target_group_with_targets(self.constants.TARGET_GROUP_1_NAME, 
+                                                self.constants.T2_LARGE, 
+                                                self.constants.NUMBER_OF_T2_LARGE_INSTANCES)
+
+        self.create_target_group_with_targets(self.constants.TARGET_GROUP_2_NAME, 
+                                                self.constants.M4_LARGE, 
+                                                self.constants.NUMBER_OF_M4_LARGE_INSTANCES)
+
+    def create_target_group_with_targets(self, target_group_name, instance_type, number_of_instances):
+        target_group = self.utilities.create_target_group(target_group_name, self.constants.VPC_ID)
+        instances = self.utilities.create_ec2_instances(self.constants.SECURITY_GROUP_ID, 
+                                                        instance_type, 
+                                                        number_of_instances, 
+                                                        self.constants.AMI_ID, 
+                                                        False)
+        ids = [s['InstanceId'] for s in instances]
+        print(ids)                                                 
+        waiter = boto3.client('ec2').get_waiter('instance_running')
+        waiter.wait()
+
+        print("Target group " + target_group_name + " created...")
+
+        targets = [ { 'Id': id, 'Port': 80 } for id in [s['InstanceId'] for s in instances]]
+        registration = self.utilities.register_targets(target_group['TargetGroups'][0]['TargetGroupArn'], targets, False)
+
+        print("Target group " + target_group_name + " registered...")
 
     def create_listeners(self):
         print("Listeners created...")
 
-    def register_vms_to_tg(self):
-        print("VMs registered to target group...")
