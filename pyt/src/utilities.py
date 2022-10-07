@@ -79,6 +79,7 @@ def describe_security_group_by_id(sg_id, silent=False):
 
 
 def create_ec2_instances(security_group_id,
+                         key_name,
                          instance_type="t2.micro",
                          count=1,
                          ami="ami-0149b2da6ceec4bb0",
@@ -89,6 +90,7 @@ def create_ec2_instances(security_group_id,
         response = client.run_instances(
             ImageId=ami,
             InstanceType=instance_type,
+            KeyName=key_name,
             MaxCount=count,
             MinCount=count,
             Monitoring={
@@ -193,7 +195,7 @@ def create_elastic_load_balancer(name, security_group_id, silent=False) -> dict:
         if not silent:
             print(e)
 
-def register_targets(target_group_arn, targets, silent=False) ->dict:
+def register_targets(target_group_arn, targets, silent=False) -> dict:
     client = boto3.client('elbv2')
 
     try:
@@ -206,14 +208,67 @@ def register_targets(target_group_arn, targets, silent=False) ->dict:
         if not silent:
             print(e)
 
-def wait_for_instances(ids):
+def wait_for_instances(ids, silent=False):
     client = boto3.client('ec2')
 
-    waiter = client.get_waiter('instance_running')
-    waiter.wait(
-        InstanceIds=ids,
-        WaiterConfig={
-            'Delay': 10,
-            'MaxAttempts': 30
-        }
-    )
+    try:
+        waiter = client.get_waiter('instance_running')
+        waiter.wait(
+            InstanceIds=ids,
+            WaiterConfig={
+                'Delay': 10,
+                'MaxAttempts': 30
+            }
+        )
+    except Exception as e:
+        if not silent:
+            print(e)
+
+def create_lister(load_balancer_arn, silent=False) -> dict:
+    client = boto3.client('elbv2')
+
+    try:
+        response = client.create_listener(
+            LoadBalancerArn=load_balancer_arn,
+            Protocol='HTTP',
+            Port=80,
+            DefaultActions=[
+                {
+                'Type': 'fixed-response',
+                'FixedResponseConfig': { 
+                    'StatusCode': '200',
+                    'ContentType': 'text/plain',
+                    'MessageBody': 'Listener listening!'}
+                }
+            ]
+        )
+        return response
+    except Exception as e:
+        if not silent:
+            print(e)
+
+def create_rule(listener_arn, target_group_name, target_group_arn, rule_count, silent=False) -> dict:
+    client = boto3.client('elbv2')
+
+    try:
+        response = client.create_rule(
+            ListenerArn=listener_arn,
+            Conditions=[
+                {
+                    'Field': 'path-pattern',
+                    'Values': [ f'/{target_group_name}' ]
+                },
+            ],
+            Priority=rule_count,
+            Actions=[
+                {
+                    'Type': 'forward',
+                    'TargetGroupArn': target_group_arn,
+                },
+            ]
+        )
+        return response
+
+    except Exception as e:
+        if not silent:
+            print(e)

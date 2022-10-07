@@ -146,7 +146,7 @@ class Controller:
         self.check_sg_and_kp()
 
         print("Creating a new VM instance...")
-        response_vm = self.utilities.create_ec2_instances(self.constants.SECURITY_GROUP_ID)
+        response_vm = self.utilities.create_ec2_instances(self.constants.SECURITY_GROUP_ID, self.constants.KEY_PAIR_NAME)
         self.vm_instances.append(response_vm[0]['InstanceId'])
 
         print(f"VM with the following ID has been created: {response_vm[0]['InstanceId']}")
@@ -194,6 +194,7 @@ class Controller:
         
         self.elastic_load_balancer.create_elb()
         self.elastic_load_balancer.create_clusters()
+        self.elastic_load_balancer.create_listeners()
 
     def run(self):
         self.initialize_env()
