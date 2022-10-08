@@ -159,13 +159,10 @@ def create_target_group(name, vpc_id, silent=False) -> dict:
             ProtocolVersion='HTTP1',
             Port=80,
             VpcId=vpc_id,
-            HealthCheckProtocol='HTTP',
-            HealthCheckPort='80',
             HealthCheckEnabled=True,
+            HealthCheckPath=f'/{name}',
             HealthCheckIntervalSeconds=10,
-            HealthCheckTimeoutSeconds=9,
-            HealthyThresholdCount=10,
-            UnhealthyThresholdCount=10,
+            HealthyThresholdCount=3,
             TargetType='instance',
             Tags=[
                 {
@@ -192,12 +189,6 @@ def create_elastic_load_balancer(name, security_group_id, silent=False) -> dict:
             security_group_id
         ],
         Scheme='internet-facing',
-        Tags=[
-            {
-                'Key': 'string',
-                'Value': 'string'
-            },
-        ],
         Type='application',
         IpAddressType='ipv4'
         )
@@ -243,7 +234,7 @@ def wait_for_target_group(target_group_arn, silent=False):
         waiter.wait(
             TargetGroupArn=target_group_arn, 
             WaiterConfig={ 
-                'Delay': 10,
+                'Delay': 10 ,
                 'MaxAttempts': 30
                 }
         )
