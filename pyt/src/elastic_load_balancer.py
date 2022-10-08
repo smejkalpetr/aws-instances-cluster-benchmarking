@@ -30,7 +30,7 @@ class ElasticLoadBalancer:
         target_group = self.utilities.create_target_group(target_group_name, self.constants.VPC_ID)
         target_group_arn = target_group['TargetGroups'][0]['TargetGroupArn']
 
-        with open("./deploy_flask.sh", 'r') as file:
+        with open("./bash/deploy_flask.sh", 'r') as file:
             user_data = file.read() % target_group_name
 
         #store target group name and its arn to access it when creating listener
