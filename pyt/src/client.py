@@ -1,17 +1,19 @@
 import json
 import requests
 import time
-def get_request(url):
-    headers={'content_types':'application/json'}
-    r=requests.get(url,headers=headers)
-    print(r.status_code)
-    print(r.json())
+class Client:
+    
+    def get_request(self,url):
+        headers={'content_types':'application/json'}
+        r=requests.get(url,headers=headers)
+        print(r.status_code)
+        print(r.content)
 
-def run_requests(url):
-    N=1000
-    for i  in range(N):
-        get_request(url)
-    time.sleep(30)
-    for i in range(N):
-        get_request(url)
+    def run_requests(self,url):
+        N=1000
+        for i  in range(N):
+            self.get_request(url)
+        time.sleep(30)
+        for i in range(N):
+            self.get_request(url)
 
