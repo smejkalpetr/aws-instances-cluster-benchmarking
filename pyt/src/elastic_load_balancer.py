@@ -28,6 +28,9 @@ class ElasticLoadBalancer:
         target_group = self.utilities.create_target_group(target_group_name, self.constants.VPC_ID)
         target_group_arn = target_group['TargetGroups'][0]['TargetGroupArn']
 
+        with open("./deploy_flask.sh", 'r') as file:
+            user_data = file.read() % target_group_name
+
         #store target group name and its arn to access it when creating listener
         self.target_groups[target_group_name] = target_group_arn
         self.utilities.print_info("Target Group " + target_group_name + " created.")
@@ -38,7 +41,8 @@ class ElasticLoadBalancer:
                                                         instance_type, 
                                                         number_of_instances, 
                                                         self.constants.AMI_ID, 
-                                                        False)
+                                                        False,
+                                                        user_data)
         self.utilities.print_info(f'{number_of_instances} Instance(s) of type {instance_type} have been created.')
         instance_ids = [i['InstanceId'] for i in instances]
         self.all_instance_ids.extend(instance_ids)

@@ -29,7 +29,7 @@ cat <<EOF > /home/ubuntu/flaskapp.py
 from flask import Flask
 app = Flask(__name__)
 
-@app.route('/cluster')
+@app.route('/%s')
 def hello_world():
     return '[VM RESPONSE] Flask app running on VM with ID $instanceId is responding...'
 EOF

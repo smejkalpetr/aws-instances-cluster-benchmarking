@@ -93,9 +93,11 @@ def create_ec2_instances(security_group_id,
                          instance_type="t2.micro",
                          count=1,
                          ami="ami-0149b2da6ceec4bb0",
-                         silent=False
+                         silent=False,
+                         user_data=""
     ):
     client = boto3.client('ec2')
+
     try:
         response = client.run_instances(
             ImageId=ami,
@@ -108,7 +110,8 @@ def create_ec2_instances(security_group_id,
             },
             SecurityGroupIds=[
                 security_group_id,
-            ]
+            ],
+            UserData=user_data
         )
         return response['Instances']
 
