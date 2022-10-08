@@ -3,6 +3,15 @@ import boto3
 def print_info(message):
     print(f'[INFO] {message}')
 
+def get_vpc(silent=False):
+    client = boto3.client('ec2')
+    try:
+        response = client.describe_vpcs()
+        return response['Vpcs'][0]['VpcId']
+    except Exception as e:
+        if not silent:
+            print(e)
+
 def create_key_pair(name="log8145-key-pair", silent=False):
     client = boto3.client('ec2')
 
@@ -209,6 +218,22 @@ def register_targets(target_group_arn, targets, silent=False) -> dict:
 
 def wait_for_instances(ids, state, silent=False):
     client = boto3.client('ec2')
+
+    try:
+        waiter = client.get_waiter(state)
+        waiter.wait(
+            InstanceIds=ids,
+            WaiterConfig={
+                'Delay': 10,
+                'MaxAttempts': 30
+            }
+        )
+    except Exception as e:
+        if not silent:
+            print(e)
+
+def wait_for_target_group(ids, state, silent=False):
+    client = boto3.client('elbv2')
 
     try:
         waiter = client.get_waiter(state)

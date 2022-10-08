@@ -18,6 +18,9 @@ class Controller:
 
     def initialize_env(self):
         self.utilities.print_info("Initializing...")
+
+        self.constants.VPC_ID = self.utilities.get_vpc()
+
         if not exists(self.constants.KEY_PAIR_PATH):
             self.utilities.create_key_pair()
 
