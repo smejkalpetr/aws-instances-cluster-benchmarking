@@ -12,6 +12,7 @@ class ElasticLoadBalancer:
         elb = self.utilities.create_elastic_load_balancer(self.constants.ELASTIC_LOAD_BALANCER_NAME, self.constants.SECURITY_GROUP_ID)
         #store load balancer arn to access it when creating listener
         self.load_balancer_arn = elb['LoadBalancers'][0]['LoadBalancerArn']
+        self.load_balancer_dns = elb['LoadBalancers'][0]['DNSName']
         self.utilities.print_info("Elastic balancer created.")
 
     def create_clusters(self):
@@ -23,6 +24,7 @@ class ElasticLoadBalancer:
                                                 self.constants.M4_LARGE, 
                                                 self.constants.NUMBER_OF_M4_LARGE_INSTANCES)
 
+    #creates clusters with instances
     def create_target_group_with_targets(self, target_group_name, instance_type, number_of_instances):
         #create target group
         target_group = self.utilities.create_target_group(target_group_name, self.constants.VPC_ID)
@@ -57,7 +59,9 @@ class ElasticLoadBalancer:
 
         self.utilities.print_info("All Instances for Target Group " + target_group_name + " have been registered.")
 
+    #creates listener with rules
     def create_listeners(self):
+        #create listener
         listener = self.utilities.create_lister(self.load_balancer_arn, silent=False)
         self.listener_arn = listener['Listeners'][0]['ListenerArn']
 
@@ -70,6 +74,13 @@ class ElasticLoadBalancer:
 
         self.utilities.print_info("Listener(s) have been created.")
 
+        #wait until all target groups are in service
+        self.utilities.print_info("Waiting for all targets to be in service...")
+        for tg_name in self.target_groups:
+            self.utilities.wait_for_target_group(self.target_groups[tg_name])
+        self.utilities.print_info("All target groups are in service.")
+
+    #deletes rules, listeners and load balancer
     def delete_load_balancer(self):
         for rule in self.rule_arns:
             self.utilities.delete_rule(rule)

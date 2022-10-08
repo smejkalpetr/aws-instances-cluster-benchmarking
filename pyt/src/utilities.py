@@ -235,17 +235,17 @@ def wait_for_instances(ids, state, silent=False):
         if not silent:
             print(e)
 
-def wait_for_target_group(ids, state, silent=False):
+def wait_for_target_group(target_group_arn, silent=False):
     client = boto3.client('elbv2')
 
     try:
-        waiter = client.get_waiter(state)
+        waiter = client.get_waiter('target_in_service')
         waiter.wait(
-            InstanceIds=ids,
-            WaiterConfig={
+            TargetGroupArn=target_group_arn, 
+            WaiterConfig={ 
                 'Delay': 10,
                 'MaxAttempts': 30
-            }
+                }
         )
     except Exception as e:
         if not silent:
