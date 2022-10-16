@@ -10,6 +10,6 @@ class Constants:
     TARGET_GROUP_2_NAME = "cluster2"
     T2_LARGE = "t2.micro"
     M4_LARGE = "t2.micro"
-    NUMBER_OF_T2_LARGE_INSTANCES = 2
-    NUMBER_OF_M4_LARGE_INSTANCES = 2
+    NUMBER_OF_T2_LARGE_INSTANCES = 4
+    NUMBER_OF_M4_LARGE_INSTANCES = 4
     VPC_ID = None

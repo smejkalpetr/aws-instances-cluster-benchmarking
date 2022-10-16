@@ -1,7 +1,9 @@
 import boto3
 
+
 def print_info(message):
     print(f'[INFO] {message}')
+
 
 def get_vpc(silent=False):
     client = boto3.client('ec2')
@@ -11,6 +13,7 @@ def get_vpc(silent=False):
     except Exception as e:
         if not silent:
             print(e)
+
 
 def create_key_pair(name="log8145-key-pair", silent=False):
     client = boto3.client('ec2')
@@ -78,6 +81,7 @@ def describe_security_group_id_by_name(name, silent=False):
         if not silent:
             print(e)
 
+
 def describe_security_group_by_id(sg_id, silent=False):
     client = boto3.client('ec2')
 
@@ -87,6 +91,7 @@ def describe_security_group_by_id(sg_id, silent=False):
     except Exception as e:
         if not silent:
             print(e)
+
 
 def create_ec2_instances(security_group_id,
                          key_name,
@@ -119,6 +124,7 @@ def create_ec2_instances(security_group_id,
         if not silent:
             print(e)
 
+
 def stop_ec2_instances(instance_ids, silent=False) -> dict:
     client = boto3.client('ec2')
 
@@ -128,6 +134,7 @@ def stop_ec2_instances(instance_ids, silent=False) -> dict:
     except Exception as e:
         if not silent:
             print(e)
+
 
 def start_ec2_instances(instance_ids, silent=False) -> dict:
     client = boto3.client('ec2')
@@ -139,6 +146,7 @@ def start_ec2_instances(instance_ids, silent=False) -> dict:
         if not silent:
             print(e)
 
+
 def terminate_ec2_instances(instance_ids, silent=False) -> dict:
     client = boto3.client('ec2')
 
@@ -148,6 +156,7 @@ def terminate_ec2_instances(instance_ids, silent=False) -> dict:
     except Exception as e:
         if not silent:
             print(e)
+
 
 def create_target_group(name, vpc_id, silent=False) -> dict:
     client = boto3.client('elbv2')
@@ -177,6 +186,7 @@ def create_target_group(name, vpc_id, silent=False) -> dict:
         if not silent:
             print(e)
 
+
 def create_elastic_load_balancer(name, security_group_id, silent=False) -> dict:
     client = boto3.client('elbv2')
     client_ec2 = boto3.client('ec2')
@@ -197,6 +207,7 @@ def create_elastic_load_balancer(name, security_group_id, silent=False) -> dict:
         if not silent:
             print(e)
 
+
 def register_targets(target_group_arn, targets, silent=False) -> dict:
     client = boto3.client('elbv2')
 
@@ -209,6 +220,7 @@ def register_targets(target_group_arn, targets, silent=False) -> dict:
     except Exception as e:
         if not silent:
             print(e)
+
 
 def wait_for_instances(ids, state, silent=False):
     client = boto3.client('ec2')
@@ -226,6 +238,7 @@ def wait_for_instances(ids, state, silent=False):
         if not silent:
             print(e)
 
+
 def wait_for_target_group(target_group_arn, silent=False):
     client = boto3.client('elbv2')
 
@@ -241,6 +254,7 @@ def wait_for_target_group(target_group_arn, silent=False):
     except Exception as e:
         if not silent:
             print(e)
+
 
 def create_lister(load_balancer_arn, silent=False) -> dict:
     client = boto3.client('elbv2')
@@ -264,6 +278,7 @@ def create_lister(load_balancer_arn, silent=False) -> dict:
     except Exception as e:
         if not silent:
             print(e)
+
 
 def create_rule(listener_arn, target_group_name, target_group_arn, rule_count, silent=False) -> dict:
     client = boto3.client('elbv2')
@@ -291,6 +306,7 @@ def create_rule(listener_arn, target_group_name, target_group_arn, rule_count, s
         if not silent:
             print(e)
 
+
 def delete_rule(rule_arn, silent=False):
     client = boto3.client('elbv2')
 
@@ -300,6 +316,7 @@ def delete_rule(rule_arn, silent=False):
     except Exception as e:
         if not silent:
             print(e)
+
 
 def delete_listener(listener_arn, silent=False):
     client = boto3.client('elbv2')
@@ -311,6 +328,7 @@ def delete_listener(listener_arn, silent=False):
         if not silent:
             print(e)
 
+
 def delete_load_balancer(load_balancer_arn, silent=False):
     client = boto3.client('elbv2')
 
@@ -320,6 +338,7 @@ def delete_load_balancer(load_balancer_arn, silent=False):
     except Exception as e:
         if not silent:
             print(e)
+
 
 def delete_target_group(target_group_arn, silent=False):
     client = boto3.client('elbv2')
@@ -331,6 +350,7 @@ def delete_target_group(target_group_arn, silent=False):
         if not silent:
             print(e)
 
+
 def delete_security_group(group_id, silent=False):
     client = boto3.client('ec2')
 
@@ -340,6 +360,7 @@ def delete_security_group(group_id, silent=False):
     except Exception as e:
         if not silent:
             print(e)
+
 
 def delete_key_pair(key_pair_name, silent=False):
     client = boto3.client('ec2')

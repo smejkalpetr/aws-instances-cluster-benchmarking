@@ -13,7 +13,7 @@ class ElasticLoadBalancer:
         #store load balancer arn to access it when creating listener
         self.load_balancer_arn = elb['LoadBalancers'][0]['LoadBalancerArn']
         self.load_balancer_dns = elb['LoadBalancers'][0]['DNSName']
-        self.utilities.print_info("Elastic Load bBalancer created.")
+        self.utilities.print_info("Elastic Load Balancer created.")
 
     def create_clusters(self):
         self.create_target_group_with_targets(self.constants.TARGET_GROUP_1_NAME, 

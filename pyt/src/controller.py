@@ -1,11 +1,14 @@
+from concurrent.futures import thread
 from dataclasses import asdict
 
 import boto3
 import src.constants
 import src.utilities
 import src.elastic_load_balancer
-from os.path import exists
+import src.client
 import os 
+import threading
+import time
 
 
 class Controller:
@@ -15,13 +18,14 @@ class Controller:
     constants = src.constants.Constants
     utilities = src.utilities
     elastic_load_balancer = None
+    client = None
 
     def initialize_env(self):
         self.utilities.print_info("Initializing...")
 
         self.constants.VPC_ID = self.utilities.get_vpc()
 
-        if not exists(self.constants.KEY_PAIR_PATH):
+        if not os.path.exists(self.constants.KEY_PAIR_PATH):
             self.utilities.create_key_pair()
 
         if self.constants.SECURITY_GROUP_NAME is not None:
@@ -190,7 +194,6 @@ class Controller:
 
         response = self.utilities.terminate_ec2_instances([instance_id])
         print(response)
-    
 
     def auto_setup(self):
         self.check_sg_and_kp()
@@ -199,6 +202,8 @@ class Controller:
         self.elastic_load_balancer.create_elb()
         self.elastic_load_balancer.create_clusters()
         self.elastic_load_balancer.create_listeners()
+
+        self.run_client()
 
     def delete_key_pair(self):
         self.utilities.delete_key_pair(self.constants.KEY_PAIR_NAME)
@@ -221,6 +226,23 @@ class Controller:
         if self.constants.SECURITY_GROUP_ID is not None:
             self.delete_security_group()
         self.delete_key_pair()
+
+    def run_client(self):
+        thread_pool = []
+        self.client = src.client.Client()
+        src.utilities.print_info("Client will start sending requests in 3 seconds...")
+        time.sleep(3);
+
+        thread_pool.append(threading.Thread(target=self.client.run_requests, args=(f'http://{self.elastic_load_balancer.load_balancer_dns}/cluster1', 1000, 0, 0,)))
+        thread_pool.append(threading.Thread(target=self.client.run_requests, args=(f'http://{self.elastic_load_balancer.load_balancer_dns}/cluster1', 500, 100, 60,)))
+        thread_pool.append(threading.Thread(target=self.client.run_requests, args=(f'http://{self.elastic_load_balancer.load_balancer_dns}/cluster2', 1000, 0, 0,)))
+        thread_pool.append(threading.Thread(target=self.client.run_requests, args=(f'http://{self.elastic_load_balancer.load_balancer_dns}/cluster2', 500, 100, 60,)))
+
+        for t in thread_pool:
+            t.start()
+
+        for t in thread_pool:
+            t.join()
 
     def run(self):
         self.initialize_env()

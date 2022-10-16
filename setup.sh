@@ -9,7 +9,20 @@ then
     echo "$0: Too many arguments: $@"
     exit 1
 else
-    if [ "$1" == "install" ];
+    if [ "$1" == "auto" ];
+    then
+        echo "Installing..."
+        mkdir -p ./keys/ ;
+        virtualenv venv && \
+        source venv/bin/activate && \
+        pip install -r requirements.txt;
+        echo "Running..."
+        python3 ./pyt/main.py;
+        echo "Cleaning..."
+        deactivate;
+        rm -rf ./venv;
+        rm -rf ./keys;
+    elif [ "$1" == "install" ];
     then
         echo "Installing..."
         mkdir -p ./keys/ ;
@@ -37,3 +50,5 @@ else
         echo "Wrong argument."
     fi
 fi
+
+

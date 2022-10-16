@@ -31,7 +31,7 @@ app = Flask(__name__)
 
 @app.route('/%s')
 def hello_world():
-    return '[VM RESPONSE] Flask app running on VM with ID $instanceId is responding...'
+    return '[VM RESPONSE] Flask app running on VM with ID $instanceId is responding.'
 EOF
 
 # export required variable and run the flask app
