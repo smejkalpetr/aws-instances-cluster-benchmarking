@@ -22,6 +22,7 @@ else
         deactivate;
         rm -rf ./venv;
         rm -rf ./keys;
+        echo "Done."
     elif [ "$1" == "install" ];
     then
         echo "Installing..."

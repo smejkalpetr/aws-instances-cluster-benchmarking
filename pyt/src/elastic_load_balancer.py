@@ -5,6 +5,8 @@ class ElasticLoadBalancer:
     constants = src.constants.Constants
     utilities = src.utilities
     target_groups = {}
+    target_group_ids = []
+    load_balancer_id = None
     all_instance_ids = []
     rule_arns = []
     
@@ -13,6 +15,7 @@ class ElasticLoadBalancer:
         #store load balancer arn to access it when creating listener
         self.load_balancer_arn = elb['LoadBalancers'][0]['LoadBalancerArn']
         self.load_balancer_dns = elb['LoadBalancers'][0]['DNSName']
+        self.load_balancer_id = elb['LoadBalancers'][0]['LoadBalancerArn'].split(f'{self.constants.ELASTIC_LOAD_BALANCER_NAME}/')[1]
         self.utilities.print_info("Elastic Load Balancer created.")
 
     def create_clusters(self):
@@ -29,6 +32,7 @@ class ElasticLoadBalancer:
         #create target group
         target_group = self.utilities.create_target_group(target_group_name, self.constants.VPC_ID)
         target_group_arn = target_group['TargetGroups'][0]['TargetGroupArn']
+        self.target_group_ids.append(target_group['TargetGroups'][0]['TargetGroupArn'].split(f'/{target_group_name}/')[1])
 
         with open("./bash/deploy_flask.sh", 'r') as file:
             user_data = file.read() % target_group_name
