@@ -1,8 +1,7 @@
 import json
 
-import boto3
 
-
+# represents the whole widget that is sent to aws as a query (in json format)
 class MetricWidget:
     data = None
     

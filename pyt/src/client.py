@@ -1,7 +1,7 @@
 import requests
 import time
 
-
+# this is the client app that connects to the ELB and performs benchmarking
 class Client:
 
     def run_requests(self, url, request_count1, request_count2, wait_time):

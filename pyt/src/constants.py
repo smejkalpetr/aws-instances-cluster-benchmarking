@@ -1,4 +1,5 @@
 
+# holds all constants that are used throughout the whole program
 class Constants:
     KEY_PAIR_NAME = "log8145-key-pair"
     KEY_PAIR_PATH = "./keys/log8145-key-pair.pem"
