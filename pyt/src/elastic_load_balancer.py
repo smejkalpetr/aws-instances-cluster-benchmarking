@@ -10,6 +10,7 @@ class ElasticLoadBalancer:
     all_instance_ids = []
     rule_arns = []
     
+    # creates the application load balancer and stores its parameters
     def create_elb(self):
         elb = self.utilities.create_elastic_load_balancer(self.constants.ELASTIC_LOAD_BALANCER_NAME, self.constants.SECURITY_GROUP_ID)
         #store load balancer arn to access it when creating listener
@@ -18,6 +19,7 @@ class ElasticLoadBalancer:
         self.load_balancer_id = elb['LoadBalancers'][0]['LoadBalancerArn'].split(f'{self.constants.ELASTIC_LOAD_BALANCER_NAME}/')[1]
         self.utilities.print_info("Elastic Load Balancer created.")
 
+    # created two clusters
     def create_clusters(self):
         self.create_target_group_with_targets(self.constants.TARGET_GROUP_1_NAME, 
                                                 self.constants.T2_LARGE, 
@@ -96,6 +98,7 @@ class ElasticLoadBalancer:
         self.utilities.delete_load_balancer(self.load_balancer_arn)
         self.utilities.print_info("Load Balancer has been deleted.")
 
+    # deleted all target groups and their assigned instances
     def delete_target_group_with_targets(self):
         self.utilities.terminate_ec2_instances(self.all_instance_ids)
 

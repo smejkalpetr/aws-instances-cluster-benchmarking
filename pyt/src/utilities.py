@@ -1,10 +1,10 @@
 import boto3
 
-
+# prints unified output
 def print_info(message):
     print(f'[INFO] {message}')
 
-
+# gets the vpc id from the aws to later use it in the program
 def get_vpc(silent=False):
     client = boto3.client('ec2')
     try:
@@ -14,7 +14,7 @@ def get_vpc(silent=False):
         if not silent:
             print(e)
 
-
+# created new key pair
 def create_key_pair(name="log8145-key-pair", silent=False):
     client = boto3.client('ec2')
 
@@ -33,7 +33,7 @@ def create_key_pair(name="log8145-key-pair", silent=False):
         if not silent:
             print(e)
 
-
+# creates new security group with given name
 def create_security_group(
         vpc_id,
         name="log8145-security-group",
@@ -70,7 +70,7 @@ def create_security_group(
         if not silent:
             print(e)
 
-
+# describes the security groups id by its given name
 def describe_security_group_id_by_name(name, silent=False):
     client = boto3.client('ec2')
 
@@ -81,7 +81,7 @@ def describe_security_group_id_by_name(name, silent=False):
         if not silent:
             print(e)
 
-
+# describes the security group id
 def describe_security_group_by_id(sg_id, silent=False):
     client = boto3.client('ec2')
 
@@ -92,7 +92,7 @@ def describe_security_group_by_id(sg_id, silent=False):
         if not silent:
             print(e)
 
-
+# creates desired number of instances of specific type
 def create_ec2_instances(security_group_id,
                          key_name,
                          instance_type="t2.micro",
@@ -124,7 +124,7 @@ def create_ec2_instances(security_group_id,
         if not silent:
             print(e)
 
-
+# stops chosen instances by their ids
 def stop_ec2_instances(instance_ids, silent=False) -> dict:
     client = boto3.client('ec2')
 
@@ -135,7 +135,7 @@ def stop_ec2_instances(instance_ids, silent=False) -> dict:
         if not silent:
             print(e)
 
-
+# starts chosen instances by their ids
 def start_ec2_instances(instance_ids, silent=False) -> dict:
     client = boto3.client('ec2')
 
@@ -146,7 +146,7 @@ def start_ec2_instances(instance_ids, silent=False) -> dict:
         if not silent:
             print(e)
 
-
+# terminates chosen instances by their ids
 def terminate_ec2_instances(instance_ids, silent=False) -> dict:
     client = boto3.client('ec2')
 
@@ -157,7 +157,7 @@ def terminate_ec2_instances(instance_ids, silent=False) -> dict:
         if not silent:
             print(e)
 
-
+# creates new target group with given name
 def create_target_group(name, vpc_id, silent=False) -> dict:
     client = boto3.client('elbv2')
 
@@ -186,7 +186,7 @@ def create_target_group(name, vpc_id, silent=False) -> dict:
         if not silent:
             print(e)
 
-
+# creates application load balancer
 def create_elastic_load_balancer(name, security_group_id, silent=False) -> dict:
     client = boto3.client('elbv2')
     client_ec2 = boto3.client('ec2')
@@ -207,7 +207,7 @@ def create_elastic_load_balancer(name, security_group_id, silent=False) -> dict:
         if not silent:
             print(e)
 
-
+# registers given instances to given target group
 def register_targets(target_group_arn, targets, silent=False) -> dict:
     client = boto3.client('elbv2')
 
@@ -221,7 +221,7 @@ def register_targets(target_group_arn, targets, silent=False) -> dict:
         if not silent:
             print(e)
 
-
+# waits for all the instances to either start running or to be terminaned based on the given parameter
 def wait_for_instances(ids, state, silent=False):
     client = boto3.client('ec2')
 
@@ -238,7 +238,7 @@ def wait_for_instances(ids, state, silent=False):
         if not silent:
             print(e)
 
-
+# waits for the target group to be in service
 def wait_for_target_group(target_group_arn, silent=False):
     client = boto3.client('elbv2')
 
@@ -255,7 +255,7 @@ def wait_for_target_group(target_group_arn, silent=False):
         if not silent:
             print(e)
 
-
+# creates listener on the load balancer
 def create_lister(load_balancer_arn, silent=False) -> dict:
     client = boto3.client('elbv2')
 
@@ -279,7 +279,7 @@ def create_lister(load_balancer_arn, silent=False) -> dict:
         if not silent:
             print(e)
 
-
+# creates rule on the listener
 def create_rule(listener_arn, target_group_name, target_group_arn, rule_count, silent=False) -> dict:
     client = boto3.client('elbv2')
 
@@ -306,7 +306,7 @@ def create_rule(listener_arn, target_group_name, target_group_arn, rule_count, s
         if not silent:
             print(e)
 
-
+# deletes the given listener rule
 def delete_rule(rule_arn, silent=False):
     client = boto3.client('elbv2')
 
@@ -317,7 +317,7 @@ def delete_rule(rule_arn, silent=False):
         if not silent:
             print(e)
 
-
+# deletes the given listener
 def delete_listener(listener_arn, silent=False):
     client = boto3.client('elbv2')
 
@@ -328,7 +328,7 @@ def delete_listener(listener_arn, silent=False):
         if not silent:
             print(e)
 
-
+# deleted the load balancer
 def delete_load_balancer(load_balancer_arn, silent=False):
     client = boto3.client('elbv2')
 
@@ -339,7 +339,7 @@ def delete_load_balancer(load_balancer_arn, silent=False):
         if not silent:
             print(e)
 
-
+# deletes the given target group
 def delete_target_group(target_group_arn, silent=False):
     client = boto3.client('elbv2')
 
@@ -350,7 +350,7 @@ def delete_target_group(target_group_arn, silent=False):
         if not silent:
             print(e)
 
-
+# deletes the given security group
 def delete_security_group(group_id, silent=False):
     client = boto3.client('ec2')
 
@@ -361,7 +361,7 @@ def delete_security_group(group_id, silent=False):
         if not silent:
             print(e)
 
-
+# deletes the given key pair
 def delete_key_pair(key_pair_name, silent=False):
     client = boto3.client('ec2')
 
@@ -372,6 +372,7 @@ def delete_key_pair(key_pair_name, silent=False):
         if not silent:
             print(e)
 
+# describes the load balancer
 def describe_load_balancers(silent=False):
     client = boto3.client('ec2')
 

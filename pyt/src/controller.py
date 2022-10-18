@@ -11,7 +11,7 @@ import os
 import threading
 import time
 
-
+# class that represents the whole application controller and logics
 class Controller:
 
     vm_instances = []
@@ -21,6 +21,7 @@ class Controller:
     elastic_load_balancer = None
     app_client = None
 
+    # gets the vpc id and to create key pair and security group if needed
     def initialize_env(self):
         self.utilities.print_info("Initializing...")
 
@@ -36,7 +37,7 @@ class Controller:
         
         self.utilities.print_info("Initialization done.")
 
-
+    # prints application menu
     def print_menu(self):
         print("<<------------------------>>")
         print("APPLICATION MENU: ")
@@ -68,10 +69,12 @@ class Controller:
         print("  [x] QUIT")
         print("<<------------------------>>")
 
+    # creates new key pair
     def create_kp(self):
         self.utilities.print_info("Creating a new Key Pair...")
         self.constants.KEY_PAIR_PATH = self.utilities.create_key_pair()
 
+    # changes the path to the directory where new key pair is created
     def change_kp_path(self):
         path = input("Insert the new key pair path: ").split()
 
@@ -84,10 +87,12 @@ class Controller:
         self.constants.KEY_PAIR_PATH = path
         self.utilities.print_info("Key pair path has been changed.")
 
+    # resets the path and the name of the new key pair
     def reset_kp_path(self):
         self.constants.KEY_PAIR_PATH = "./keys/log8145-key-pair.pem"
         self.utilities.print_info("Key pair path has been reset.")
 
+    # creates a new security group
     def create_sg(self):
 
         name = input("Insert the new Security Group name: ").split()
@@ -111,6 +116,7 @@ class Controller:
                                             )
         self.constants.SECURITY_GROUP_NAME = name
 
+    # changes security group used by the application
     def change_sg_name_and_id(self):
         name = input("Insert the new Security Group name: ").split()
 
@@ -131,11 +137,13 @@ class Controller:
         self.constants.SECURITY_GROUP_NAME = name
         self.constants.SECURITY_GROUP_ID = sg_id
 
+    # resets security group attributes
     def reset_sg_name_and_id(self):
         self.constants.SECURITY_GROUP_NAME = "log8145-security-group"
         self.constants.SECURITY_GROUP_ID = None
         self.utilities.print_info("Security Group name and ID have been reset.")
 
+    # checks if key pair and security group exist
     def check_sg_and_kp(self):
         if self.constants.KEY_PAIR_PATH is None:
             print("[ERROR]: There is no Key Pair path specified. Specify one and then try again.")
@@ -154,6 +162,7 @@ class Controller:
             else:
                 self.constants.SECURITY_GROUP_ID = response_sg_id
 
+    # creates single instance
     def launch_one_vm(self):
         self.check_sg_and_kp()
 
@@ -163,6 +172,7 @@ class Controller:
 
         self.utilities.print_info(f"VM with the following ID has been created: {response_vm[0]['InstanceId']}")
 
+    # starts single instance
     def start_one_vm(self):
         instance_id = input("Insert the instance ID: ").split()
 
@@ -175,6 +185,7 @@ class Controller:
         response = self.utilities.start_ec2_instances([instance_id])
         print(response)
 
+    # stops single instance
     def stop_one_vm(self):
         instance_id = input("Insert the instance ID: ").split()
 
@@ -187,6 +198,7 @@ class Controller:
         response = self.utilities.stop_ec2_instances([instance_id])
         print(response)
 
+    # terminates single instance
     def terminate_one_vm(self):
         instance_id = input("Insert the instance ID: ").split()
 
@@ -199,6 +211,7 @@ class Controller:
         response = self.utilities.terminate_ec2_instances([instance_id])
         print(response)
 
+    # runs the whole automated solution
     def auto_setup(self):
         self.check_sg_and_kp()
         self.elastic_load_balancer = src.elastic_load_balancer.ElasticLoadBalancer()
@@ -209,6 +222,7 @@ class Controller:
 
         self.run_client()
 
+    # deletes the used key pair and its directory
     def delete_key_pair(self):
         self.utilities.delete_key_pair(self.constants.KEY_PAIR_NAME, silent=True)
 
@@ -218,10 +232,12 @@ class Controller:
 
         self.utilities.print_info("Key Pair "+ self.constants.KEY_PAIR_NAME + " has been deleted.")
 
+    # deletes the security group
     def delete_security_group(self):
         self.utilities.delete_security_group(self.constants.SECURITY_GROUP_ID, silent=True)
         self.utilities.print_info("Security Group " + self.constants.SECURITY_GROUP_NAME + " has been deleted.")
 
+    # automatically shuts down and deletes all instances, load balancer, target groups, listeners, security group and key pair
     def auto_shutdown(self):
         if self.elastic_load_balancer is not None:
             self.elastic_load_balancer.delete_load_balancer()
@@ -231,6 +247,7 @@ class Controller:
             self.delete_security_group()
         self.delete_key_pair()
 
+    # runs the multiple clients on the load balancer
     def run_client(self):
         thread_pool = []
         self.app_client = src.client.Client()
@@ -248,6 +265,7 @@ class Controller:
         for t in thread_pool:
             t.join()
 
+    # generates the graphs with metrics
     def get_metrics(self):
         metrics_handler = src.metrics_handler.CloudWatchMetricsHandler(self.elastic_load_balancer.all_instance_ids,
                                                                        self.elastic_load_balancer.load_balancer_id,
@@ -262,6 +280,7 @@ class Controller:
         self.utilities.print_info("Getting metrics for all target groups...")
         metrics_handler.get_target_groups_metrics()
 
+    # runs the whole application controller
     def run(self):
         self.initialize_env()
 
