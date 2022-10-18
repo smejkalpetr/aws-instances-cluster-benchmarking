@@ -372,3 +372,21 @@ def delete_key_pair(key_pair_name, silent=False):
         if not silent:
             print(e)
 
+def describe_load_balancers(silent=False):
+    client = boto3.client('ec2')
+
+    try:
+        response = client.describe_load_balancers(
+            LoadBalancerArns=[
+                'string',
+            ],
+            Names=[
+                'string',
+            ],
+            Marker='string',
+            PageSize=123
+        )
+
+    except Exception as e:
+        if not silent:
+            print(e)

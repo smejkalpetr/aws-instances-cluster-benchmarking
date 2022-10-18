@@ -5,6 +5,7 @@ import boto3
 import src.constants
 import src.utilities
 import src.elastic_load_balancer
+import src.metrics_handler
 import src.client
 import os 
 import threading
@@ -18,7 +19,7 @@ class Controller:
     constants = src.constants.Constants
     utilities = src.utilities
     elastic_load_balancer = None
-    client = None
+    app_client = None
 
     def initialize_env(self):
         self.utilities.print_info("Initializing...")
@@ -60,7 +61,10 @@ class Controller:
         print("  [k] START A VM INSTANCE")
         print("  <<---------------------->>")
 
-        print("  [l] LIST MENU")
+        print("  [l] RUN METRICS")
+        print("  <<---------------------->>")
+
+        print("  [m] LIST MENU")
         print("  [x] QUIT")
         print("<<------------------------>>")
 
@@ -206,7 +210,7 @@ class Controller:
         self.run_client()
 
     def delete_key_pair(self):
-        self.utilities.delete_key_pair(self.constants.KEY_PAIR_NAME)
+        self.utilities.delete_key_pair(self.constants.KEY_PAIR_NAME, silent=True)
 
         cctp1_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         keys_path = os.path.abspath(os.path.join(cctp1_path, 'keys'))
@@ -215,7 +219,7 @@ class Controller:
         self.utilities.print_info("Key Pair "+ self.constants.KEY_PAIR_NAME + " has been deleted.")
 
     def delete_security_group(self):
-        self.utilities.delete_security_group(self.constants.SECURITY_GROUP_ID)
+        self.utilities.delete_security_group(self.constants.SECURITY_GROUP_ID, silent=True)
         self.utilities.print_info("Security Group " + self.constants.SECURITY_GROUP_NAME + " has been deleted.")
 
     def auto_shutdown(self):
@@ -229,20 +233,34 @@ class Controller:
 
     def run_client(self):
         thread_pool = []
-        self.client = src.client.Client()
+        self.app_client = src.client.Client()
         src.utilities.print_info("Client will start sending requests in 3 seconds...")
         time.sleep(3);
 
-        thread_pool.append(threading.Thread(target=self.client.run_requests, args=(f'http://{self.elastic_load_balancer.load_balancer_dns}/cluster1', 1000, 0, 0,)))
-        thread_pool.append(threading.Thread(target=self.client.run_requests, args=(f'http://{self.elastic_load_balancer.load_balancer_dns}/cluster1', 500, 100, 60,)))
-        thread_pool.append(threading.Thread(target=self.client.run_requests, args=(f'http://{self.elastic_load_balancer.load_balancer_dns}/cluster2', 1000, 0, 0,)))
-        thread_pool.append(threading.Thread(target=self.client.run_requests, args=(f'http://{self.elastic_load_balancer.load_balancer_dns}/cluster2', 500, 100, 60,)))
+        thread_pool.append(threading.Thread(target=self.app_client.run_requests, args=(f'http://{self.elastic_load_balancer.load_balancer_dns}/cluster1', 1000, 0, 0,)))
+        thread_pool.append(threading.Thread(target=self.app_client.run_requests, args=(f'http://{self.elastic_load_balancer.load_balancer_dns}/cluster1', 500, 100, 60,)))
+        thread_pool.append(threading.Thread(target=self.app_client.run_requests, args=(f'http://{self.elastic_load_balancer.load_balancer_dns}/cluster2', 1000, 0, 0,)))
+        thread_pool.append(threading.Thread(target=self.app_client.run_requests, args=(f'http://{self.elastic_load_balancer.load_balancer_dns}/cluster2', 500, 100, 60,)))
 
         for t in thread_pool:
             t.start()
 
         for t in thread_pool:
             t.join()
+
+    def get_metrics(self):
+        metrics_handler = src.metrics_handler.CloudWatchMetricsHandler(self.elastic_load_balancer.all_instance_ids,
+                                                                       self.elastic_load_balancer.load_balancer_id,
+                                                                       self.elastic_load_balancer.target_group_ids)
+
+        self.utilities.print_info("Getting metrics for all instances...")
+        metrics_handler.get_metrics_for_instances()
+
+        self.utilities.print_info("Getting metrics for all load balancers...")
+        metrics_handler.get_metrics_for_elb()
+
+        self.utilities.print_info("Getting metrics for all target groups...")
+        metrics_handler.get_target_groups_metrics()
 
     def run(self):
         self.initialize_env()
@@ -281,7 +299,9 @@ class Controller:
             elif cmd_input == 'k':
                 self.start_one_vm()
             elif cmd_input == 'l':
-                self.printMenu()
+                self.get_metrics()
+            elif cmd_input == 'm':
+                self.print_menu()
             elif cmd_input == 'x':
                 self.auto_shutdown()
                 print("Goodbye! :)")

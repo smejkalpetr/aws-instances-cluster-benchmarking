@@ -6,6 +6,7 @@ if __name__ == '__main__':
     # for the assignment (everything automated)
     ctrl.initialize_env()
     ctrl.auto_setup()
+    ctrl.get_metrics()
     ctrl.auto_shutdown()
 
     # shows menu (used for testing purposes)
